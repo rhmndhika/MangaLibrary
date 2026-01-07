@@ -1,12 +1,20 @@
 /**
- * MANGADEX API SERVICE - FULL VERSION (CORS BYPASS & VERCEL READY)
+ * MANGADEX API SERVICE - FINAL REVISED (NGROK & VERCEL COMPATIBLE)
  */
 
 const getBaseUrl = () => {
-  if (typeof window === 'undefined') return 'https://api.mangadex.org';
+  // Jika sedang berjalan di browser (development/ngrok), gunakan proxy Vite
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    
+    // Jika di local atau ngrok, gunakan path proxy Vite
+    if (hostname === 'localhost' || hostname.includes('ngrok-free.dev')) {
+      return `${window.location.origin}/api-proxy`;
+    }
+  }
   
-  const isProd = window.location.hostname !== 'localhost';
-  // Menggunakan domain origin + path proxy yang didaftarkan di vercel.json
+  // Jika di Vercel Production
+  const isProd = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
   return isProd 
     ? `${window.location.origin}/api/mangadex` 
     : 'https://api.mangadex.org';
@@ -14,22 +22,22 @@ const getBaseUrl = () => {
 
 const BASE_URL = getBaseUrl();
 
-/**
- * HELPER: Membangun query string yang benar.
- * Mencegah error [object Object] pada parameter nested seperti order.
- */
+// Pastikan fungsi getHeaders tetap ada untuk ngrok
+const getHeaders = () => ({
+  'Content-Type': 'application/json',
+  'ngrok-skip-browser-warning': 'true'
+});
+
 const buildQueryParams = (urlObj, params) => {
   Object.keys(params).forEach(key => {
     const value = params[key];
     if (value === undefined || value === null) return;
 
     if (typeof value === 'object' && !Array.isArray(value)) {
-      // Menangani order[chapter]=desc
       Object.keys(value).forEach(subKey => {
         urlObj.searchParams.append(`${key}[${subKey}]`, value[subKey]);
       });
     } else if (Array.isArray(value)) {
-      // Menangani includes[]=cover_art
       value.forEach(val => {
         const cleanKey = key.includes('[]') ? key : `${key}[]`;
         urlObj.searchParams.append(cleanKey, val);
@@ -42,12 +50,9 @@ const buildQueryParams = (urlObj, params) => {
 
 // --- CORE API FUNCTIONS ---
 
-/**
- * 1. Fetch Genres / Tags
- */
 export const fetchGenres = async () => {
   try {
-    const res = await fetch(`${BASE_URL}/manga/tag`);
+    const res = await fetch(`${BASE_URL}/manga/tag`, { headers: getHeaders() });
     if (!res.ok) throw new Error("Gagal mengambil tags");
     return await res.json();
   } catch (error) {
@@ -56,9 +61,6 @@ export const fetchGenres = async () => {
   }
 };
 
-/**
- * 2. Fetch Manga List (Home, Search, & Filters)
- */
 export const fetchManga = async (params = {}, options = {}) => {
   try {
     const url = new URL(`${BASE_URL}/manga`);
@@ -70,7 +72,6 @@ export const fetchManga = async (params = {}, options = {}) => {
     };
     
     const finalParams = { ...defaultParams, ...params };
-    
     if (!finalParams['order[latestUploadedChapter]'] && !params.order) {
       finalParams['order[latestUploadedChapter]'] = 'desc';
     }
@@ -79,7 +80,7 @@ export const fetchManga = async (params = {}, options = {}) => {
 
     const response = await fetch(url.toString(), {
       ...options,
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
     });
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -90,9 +91,6 @@ export const fetchManga = async (params = {}, options = {}) => {
   }
 };
 
-/**
- * 3. Fetch Latest Updates (Halaman Terbaru)
- */
 export const fetchLatestUpdates = async (limit = 24, offset = 0) => {
   const url = new URL(`${BASE_URL}/manga`);
   const params = {
@@ -103,23 +101,20 @@ export const fetchLatestUpdates = async (limit = 24, offset = 0) => {
     'order': { latestUploadedChapter: 'desc' }
   };
   buildQueryParams(url, params);
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), { headers: getHeaders() });
   if (!res.ok) throw new Error("Gagal mengambil update terbaru");
   return res.json();
 };
 
-/**
- * 4. Fetch Detail Satu Manga
- */
 export const fetchMangaDetail = async (id) => {
-  const res = await fetch(`${BASE_URL}/manga/${id}?includes[]=artist&includes[]=author&includes[]=cover_art`);
+  const res = await fetch(
+    `${BASE_URL}/manga/${id}?includes[]=artist&includes[]=author&includes[]=cover_art`,
+    { headers: getHeaders() }
+  );
   if (!res.ok) throw new Error("Gagal mengambil detail manga");
   return res.json();
 };
 
-/**
- * 5. Fetch Daftar Chapter (Feed)
- */
 export const fetchMangaFeed = async (mangaId, offset = 0) => {
   const url = new URL(`${BASE_URL}/manga/${mangaId}/feed`);
   const params = {
@@ -133,26 +128,20 @@ export const fetchMangaFeed = async (mangaId, offset = 0) => {
     includeUnavailable: 0,
   };
   buildQueryParams(url, params);
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), { headers: getHeaders() });
   if (!res.ok) throw new Error("Gagal mengambil feed chapter");
   return res.json();
 };
 
-/**
- * 6. Fetch Chapter Pages (Untuk Reader)
- * Menggunakan dataSaver agar loading cepat.
- */
 export const fetchChapterPages = async (chapterId) => {
   try {
-    // Lewat Proxy agar bypass CORS
-    const res = await fetch(`${BASE_URL}/at-home/server/${chapterId}`);
+    const res = await fetch(`${BASE_URL}/at-home/server/${chapterId}`, { headers: getHeaders() });
     if (!res.ok) throw new Error("Gagal mengambil data server gambar");
     
     const data = await res.json();
     const host = data.baseUrl;
     const { hash, dataSaver } = data.chapter; 
     
-    // File gambar (.jpg) diizinkan akses langsung dari host MangaDex
     return dataSaver.map((file) => `${host}/data-saver/${hash}/${file}`);
   } catch (error) {
     console.error("Gagal memuat halaman chapter:", error);
@@ -170,6 +159,5 @@ export const getTitle = (manga) => {
 export const getCoverUrl = (manga) => {
   const coverRel = manga.relationships?.find(rel => rel.type === "cover_art");
   const fileName = coverRel?.attributes?.fileName;
-  // Gunakan thumbnail 256px agar performa Vercel optimal
   return fileName ? `https://uploads.mangadex.org/covers/${manga.id}/${fileName}.256.jpg` : null;
 };
