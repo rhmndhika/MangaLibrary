@@ -87,13 +87,6 @@ const Reader = () => {
           />
         ))}
       </div>
-
-      {/* 3. Bottom Quick Navigation (Opsional) */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-         <p className="bg-black/60 text-white/50 text-[10px] px-3 py-1 rounded-full backdrop-blur-sm uppercase tracking-widest font-bold">
-            Data Saver Active
-         </p>
-      </div>
     </div>
   );
 };
