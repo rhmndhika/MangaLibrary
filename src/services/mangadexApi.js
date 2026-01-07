@@ -151,5 +151,8 @@ export const getTitle = (manga) => {
 export const getCoverUrl = (manga) => {
   const coverRel = manga.relationships?.find(rel => rel.type === "cover_art");
   const fileName = coverRel?.attributes?.fileName;
-  return fileName ? `https://uploads.mangadex.org/covers/${manga.id}/${fileName}.256.jpg` : null;
+  
+  return fileName 
+    ? `https://uploads.mangadex.org/covers/${manga.id}/${fileName}.256.jpg` 
+    : null;
 };
