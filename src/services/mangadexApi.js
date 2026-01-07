@@ -126,14 +126,23 @@ export const fetchMangaFeed = async (mangaId, offset = 0) => {
 
 // 5. Fetch Gambar untuk Reader (Gunakan Data Saver agar Ringan)
 export const fetchChapterImages = async (chapterId) => {
-  // At-Home server seringkali memerlukan akses langsung tanpa proxy untuk performa
-  const res = await fetch(`https://api.mangadex.org/at-home/server/${chapterId}`);
-  const data = await res.json();
-  const host = data.baseUrl;
-  const { hash, dataSaver } = data.chapter; 
-  
-  // Menggunakan dataSaver (lebih kecil/cepat daripada data original)
-  return dataSaver.map((file) => `${host}/data-saver/${hash}/${file}`);
+  try {
+    // GUNAKAN BASE_URL (relatif/proxy), JANGAN URL mangadex langsung
+    const res = await fetch(`${BASE_URL}/at-home/server/${chapterId}`);
+    
+    if (!res.ok) throw new Error("Gagal mengambil data server gambar");
+    
+    const data = await res.json();
+    const host = data.baseUrl;
+    const { hash, dataSaver } = data.chapter; 
+    
+    // URL gambar (host) biasanya berbeda domain, tetapi MangaDex membolehkan 
+    // akses langsung untuk file gambar (.jpg/.png), jadi ini aman.
+    return dataSaver.map((file) => `${host}/data-saver/${hash}/${file}`);
+  } catch (error) {
+    console.error("Gagal memuat halaman:", error);
+    throw error;
+  }
 };
 
 // --- HELPER FUNCTIONS ---
