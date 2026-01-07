@@ -9,7 +9,7 @@ const LatestPage = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalManga, setTotalManga] = useState(0);
-  const limit = 12; // Jumlah manga per halaman
+  const limit = 12;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const LatestPage = () => {
         const response = await fetchManga({
           limit: limit,
           offset: offset,
-          'order[latestUploadedChapter]': 'desc', // Urutkan berdasarkan update terbaru
+          'order[latestUploadedChapter]': 'desc',
         });
 
         if (response && response.data) {
@@ -34,7 +34,7 @@ const LatestPage = () => {
       }
     };
     loadData();
-    window.scrollTo(0, 0); // Scroll ke atas setiap ganti halaman
+    window.scrollTo(0, 0);
   }, [currentPage]);
 
   const totalPages = Math.ceil(totalManga / limit);
@@ -112,7 +112,6 @@ const LatestPage = () => {
               
               <div className="flex gap-1">
                 {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                  // Logika sederhana untuk menampilkan range halaman
                   let pageNum = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
                   if (pageNum > totalPages) return null;
 

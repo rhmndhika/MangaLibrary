@@ -15,7 +15,7 @@ const Reader = () => {
     const loadPages = async () => {
       setLoading(true);
       try {
-        const imageUrls = await fetchChapterPages(chapterId); // Menggunakan data-saver untuk efisiensi
+        const imageUrls = await fetchChapterPages(chapterId);
         setPages(imageUrls);
       } catch (err) {
         console.error("Gagal memuat halaman:", err);
@@ -26,7 +26,6 @@ const Reader = () => {
     loadPages();
   }, [chapterId]);
 
-  // Fungsi untuk toggle navbar saat layar diklik (opsional)
   const toggleNav = () => setShowNavbar(!showNavbar);
 
   if (loading) return (
@@ -38,7 +37,6 @@ const Reader = () => {
 
   return (
     <div className="relative bg-zinc-950 min-h-screen">
-      {/* 1. Top Navigation Bar (Floating) */}
       <nav className={`fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 transition-transform duration-300 ${showNavbar ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between text-white">
           <div className="flex items-center gap-4">

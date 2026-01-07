@@ -24,9 +24,7 @@ const Detail = () => {
     loadManga();
   }, [id]);
 
-  // UPDATE: Fungsi untuk menangani klik pada tag
   const handleTagClick = (tagId, tagName) => {
-    // Navigasi ke halaman search dengan parameter tagId dan tagName
     navigate(`/search?tagId=${tagId}&tagName=${tagName}`);
   };
 
@@ -66,7 +64,6 @@ const Detail = () => {
             {manga.attributes.description.en || "No description available."}
           </p>
           
-          {/* UPDATE: Tags sekarang bisa diklik */}
           <div className="flex flex-wrap gap-2 mt-6">
             {manga.attributes.tags.map(tag => (
               <button 
@@ -82,7 +79,6 @@ const Detail = () => {
       </div>
 
       {/* Chapter List Section */}
-      {/* Menggunakan manga.id dan mengirim data tambahan yang diperlukan */}
       <ChapterList 
         mangaId={manga.id} 
       />

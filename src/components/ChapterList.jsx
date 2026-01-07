@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 
 const ChapterList = ({ mangaId }) => {
   const navigate = useNavigate();
-  const [allChapters, setAllChapters] = useState([]); // Data asli dari API
-  const [filteredChapters, setFilteredChapters] = useState([]); // Data setelah filter & deduplikasi
-  const [languages, setLanguages] = useState([]); // List bahasa yang tersedia
+  const [allChapters, setAllChapters] = useState([]);
+  const [filteredChapters, setFilteredChapters] = useState([]);
+  const [languages, setLanguages] = useState([]);
   const [selectedLang, setSelectedLang] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -20,11 +20,9 @@ const ChapterList = ({ mangaId }) => {
         const data = response.data || [];
         setAllChapters(data);
 
-        // Ambil daftar bahasa unik dari data yang masuk
         const availableLangs = [...new Set(data.map(ch => ch.attributes.translatedLanguage))];
         setLanguages(availableLangs);
 
-        // Set default bahasa ke 'en' jika ada, jika tidak ambil yang pertama
         if (availableLangs.includes('en')) {
           setSelectedLang('en');
         } else if (availableLangs.length > 0) {
@@ -39,7 +37,6 @@ const ChapterList = ({ mangaId }) => {
     loadData();
   }, [mangaId]);
 
-  // Efek untuk memproses filter bahasa dan deduplikasi
   useEffect(() => {
     if (allChapters.length === 0) return;
 

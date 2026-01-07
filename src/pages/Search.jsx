@@ -8,7 +8,6 @@ const Search = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Mengambil parameter dari URL (?tagId=...&tagName=...)
   const queryParams = new URLSearchParams(location.search);
   const tagIdFromUrl = queryParams.get('tagId');
   const tagNameFromUrl = queryParams.get('tagName');
@@ -17,19 +16,17 @@ const Search = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fungsi untuk membersihkan semua filter dan hasil
   const clearFilters = () => {
-    setResults([]); // Menghilangkan hasil search dari layar
-    setSearchTerm(''); // Mengosongkan kolom input
-    navigate('/search', { replace: true }); // Membersihkan URL
+    setResults([]);
+    setSearchTerm('');
+    navigate('/search', { replace: true });
   };
 
-  // Definisi fungsi untuk load manga berdasarkan Tag ID
   const loadMangaByTag = async (tagId) => {
     setLoading(true);
     try {
       const data = await fetchManga({
-        'includedTags[]': [tagId], // Mengirim tagId ke API
+        'includedTags[]': [tagId],
         limit: 24,
         'includes[]': ['cover_art']
       });
@@ -41,14 +38,12 @@ const Search = () => {
     }
   };
 
-  // Menjalankan pencarian otomatis jika ada tagId di URL
   useEffect(() => {
     if (tagIdFromUrl) {
       loadMangaByTag(tagIdFromUrl);
     }
   }, [tagIdFromUrl]);
 
-  // Fungsi pencarian manual lewat input teks
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
     if (!searchTerm) return;
@@ -60,7 +55,6 @@ const Search = () => {
         'includes[]': ['cover_art']
       });
       setResults(data.data || []);
-      // Jika mencari manual, hapus parameter tag dari URL agar tidak membingungkan
       if (tagIdFromUrl) navigate('/search', { replace: true });
     } catch (err) {
       console.error(err);
@@ -71,7 +65,6 @@ const Search = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 min-h-screen bg-white">
-      {/* Search Input Bar */}
       <form onSubmit={handleSearchSubmit} className="relative mb-8 max-w-2xl mx-auto">
         <input 
           type="text" 
@@ -82,7 +75,6 @@ const Search = () => {
         />
         <SearchIcon className="absolute left-4 top-4 text-gray-400" size={22} />
         
-        {/* Tombol X untuk membersihkan input */}
         {searchTerm && (
           <button 
             type="button"
@@ -94,7 +86,6 @@ const Search = () => {
         )}
       </form>
 
-      {/* Label Indikator Filter Tag */}
       {tagNameFromUrl && (
         <div className="mb-8 flex items-center justify-between bg-blue-50 p-4 rounded-2xl border border-blue-100">
           <div className="flex items-center gap-2">
@@ -104,7 +95,7 @@ const Search = () => {
             </span>
           </div>
           <button 
-            onClick={clearFilters} // Aksi hapus filter
+            onClick={clearFilters}
             className="flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-white hover:bg-blue-600 bg-white px-4 py-2 rounded-xl shadow-sm transition-all border border-blue-100"
           >
             HAPUS FILTER
@@ -112,7 +103,6 @@ const Search = () => {
         </div>
       )}
 
-      {/* Konten Utama: Loading, Hasil, atau Kosong */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32">
           <Loader2 className="animate-spin text-blue-600 mb-4" size={48} />
@@ -129,7 +119,6 @@ const Search = () => {
           ))}
         </div>
       ) : (
-        /* Tampilan saat tidak ada hasil atau filter dihapus */
         <div className="py-32 text-center">
           <div className="inline-flex items-center justify-center w-24 h-24 bg-gray-50 rounded-full mb-6">
             <SearchIcon size={40} className="text-gray-200" />

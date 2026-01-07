@@ -23,8 +23,6 @@ const Home = () => {
   useEffect(() => {
     const fetchTags = async () => {
     try {
-        // JANGAN GUNAKAN: fetch('https://api.mangadex.org/...')
-        // GUNAKAN fungsi dari mangadexApi.js
         const json = await fetchGenres(); 
         
         const genreTags = json.data
@@ -59,7 +57,6 @@ const Home = () => {
     fetchLatest();
   }, []);
 
-  // 2. Fetch Manga berdasarkan Genre yang dipilih
   useEffect(() => {
     if (!activeGenre) return;
 
@@ -108,27 +105,27 @@ const Home = () => {
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px]"></div>
       </section>
 
-{/* Newest Section */}
-<section>
-  <div className="flex items-center justify-between mb-8">
-    <div className="flex items-center gap-3">
-      <div className="p-2 bg-orange-100 text-orange-600 rounded-xl">
-        <Flame size={24} fill="currentColor" />
-      </div>
-      <h2 className="text-2xl font-extrabold text-gray-800">Latest Updates</h2>
-    </div>
-    
-    <button 
-      onClick={() => navigate('/latest')} 
-      className="group flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-white transition-all bg-blue-50 px-5 py-2.5 rounded-full hover:bg-blue-600 shadow-sm border border-blue-100"
-    >
-      See All 
-      <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-    </button>
-  </div>
-  
-  <LatestUpdates />
-</section>
+      {/* Newest Section */}
+      <section>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-orange-100 text-orange-600 rounded-xl">
+              <Flame size={24} fill="currentColor" />
+            </div>
+            <h2 className="text-2xl font-extrabold text-gray-800">Latest Updates</h2>
+          </div>
+          
+          <button 
+            onClick={() => navigate('/latest')} 
+            className="group flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-white transition-all bg-blue-50 px-5 py-2.5 rounded-full hover:bg-blue-600 shadow-sm border border-blue-100"
+          >
+            See All 
+            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+        
+        <LatestUpdates />
+      </section>
 
       {/* Dynamic Genre Section */}
       <section>

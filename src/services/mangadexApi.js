@@ -3,17 +3,14 @@
  */
 
 const getBaseUrl = () => {
-  // Jika sedang berjalan di browser (development/ngrok), gunakan proxy Vite
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     
-    // Jika di local atau ngrok, gunakan path proxy Vite
     if (hostname === 'localhost' || hostname.includes('ngrok-free.dev')) {
       return `${window.location.origin}/api-proxy`;
     }
   }
   
-  // Jika di Vercel Production
   const isProd = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
   return isProd 
     ? `${window.location.origin}/api/mangadex` 
@@ -22,7 +19,6 @@ const getBaseUrl = () => {
 
 const BASE_URL = getBaseUrl();
 
-// Pastikan fungsi getHeaders tetap ada untuk ngrok
 const getHeaders = () => ({
   'Content-Type': 'application/json',
   'ngrok-skip-browser-warning': 'true'
@@ -47,8 +43,6 @@ const buildQueryParams = (urlObj, params) => {
     }
   });
 };
-
-// --- CORE API FUNCTIONS ---
 
 export const fetchGenres = async () => {
   try {
@@ -148,8 +142,6 @@ export const fetchChapterPages = async (chapterId) => {
     throw error;
   }
 };
-
-// --- HELPER FUNCTIONS ---
 
 export const getTitle = (manga) => {
   if (!manga?.attributes?.title) return "Unknown Title";

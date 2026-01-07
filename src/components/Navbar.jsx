@@ -14,7 +14,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* --- DESKTOP TOP NAVBAR (Hidden on Mobile) --- */}
       <nav className="hidden md:flex fixed top-0 w-full bg-white border-b z-50 px-6 py-3 justify-between items-center">
         <div className="font-black text-xl text-blue-600">MangaApp</div>
         <div className="flex gap-8">
@@ -31,7 +30,6 @@ const Navbar = () => {
         <User className="text-gray-400" />
       </nav>
 
-      {/* --- MOBILE BOTTOM NAVBAR (Hidden on Desktop) --- */}
       <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-lg border-t z-50 pb-safe">
         <div className="flex justify-around items-end py-3">
           {navItems.map((item) => {
@@ -50,7 +48,6 @@ const Navbar = () => {
                 <span className={`text-[10px] font-black ${isActive ? 'text-blue-600' : 'text-gray-400'}`}>
                   {item.label}
                 </span>
-                {/* Active Indicator Dot */}
                 {isActive && <div className="w-1 h-1 bg-blue-600 rounded-full mt-0.5" />}
               </button>
             );
