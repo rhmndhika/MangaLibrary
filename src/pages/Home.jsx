@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchManga } from '../services/mangadexApi';
+import { fetchManga, fetchGenres } from '../services/mangadexApi';
 import MangaCard from '../components/MangaCard';
 import { Loader2, Sparkles, Zap, Flame } from 'lucide-react';
 import LatestUpdates from '../components/LatestUpdate';
@@ -22,23 +22,23 @@ const Home = () => {
   // 1. Fetch Genre/Tags dari API saat pertama kali load
   useEffect(() => {
     const fetchTags = async () => {
-      try {
-        const res = await fetch('https://api.mangadex.org/manga/tag');
-        const json = await res.json();
+    try {
+        // JANGAN GUNAKAN: fetch('https://api.mangadex.org/...')
+        // GUNAKAN fungsi dari mangadexApi.js
+        const json = await fetchGenres(); 
         
-        // Filter hanya yang tipenya 'genre' (opsional, bisa juga ambil semua)
         const genreTags = json.data
-          .filter(tag => tag.attributes.group === 'genre')
-          .map(tag => ({
+        .filter(tag => tag.attributes.group === 'genre')
+        .map(tag => ({
             id: tag.id,
             name: tag.attributes.name.en
-          }));
+        }));
 
         setGenres(genreTags);
         if (genreTags.length > 0) setActiveGenre(genreTags[0]);
-      } catch (err) {
+    } catch (err) {
         console.error("Gagal mengambil tags:", err);
-      }
+    }
     };
 
     const fetchLatest = async () => {

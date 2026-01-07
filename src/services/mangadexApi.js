@@ -158,3 +158,16 @@ export const fetchChapterPages = async (chapterId) => {
   const { hash, dataSaver } = data.chapter;
   return dataSaver.map(file => `${host}/data-saver/${hash}/${file}`);
 };
+
+// Tambahkan ini di mangadexApi.js
+export const fetchGenres = async () => {
+  try {
+    // Menggunakan BASE_URL yang sudah kita set (mengarah ke /api/mangadex di prod)
+    const res = await fetch(`${BASE_URL}/manga/tag`);
+    if (!res.ok) throw new Error("Gagal mengambil tags");
+    return await res.json();
+  } catch (error) {
+    console.error("Genre Fetch Error:", error);
+    throw error;
+  }
+};
