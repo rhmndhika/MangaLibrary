@@ -70,7 +70,7 @@ const Navbar = () => {
               onClick={() => navigate('/login')}
               className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-full text-xs font-black hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
             >
-              <LogIn size={16} /> LOGIN MD
+              <LogIn size={16} /> Login
             </button>
           )}
         </div>
