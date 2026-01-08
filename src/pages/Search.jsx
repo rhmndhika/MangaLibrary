@@ -12,13 +12,31 @@ const Search = () => {
   const tagIdFromUrl = queryParams.get('tagId');
   const tagNameFromUrl = queryParams.get('tagName');
 
-  const [results, setResults] = useState([]);
+  // --- MODIFIKASI: Inisialisasi state dari sessionStorage ---
+  const [results, setResults] = useState(() => {
+    const savedResults = sessionStorage.getItem('last_search_results');
+    return savedResults ? JSON.parse(savedResults) : [];
+  });
+
+  const [searchTerm, setSearchTerm] = useState(() => {
+    return sessionStorage.getItem('last_search_term') || '';
+  });
+  // ----------------------------------------------------------
+
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+
+  // Fungsi untuk menyimpan data ke session storage
+  const saveToSession = (term, data) => {
+    sessionStorage.setItem('last_search_term', term);
+    sessionStorage.setItem('last_search_results', JSON.stringify(data));
+  };
 
   const clearFilters = () => {
     setResults([]);
     setSearchTerm('');
+    // Hapus juga dari session storage saat filter dibersihkan
+    sessionStorage.removeItem('last_search_term');
+    sessionStorage.removeItem('last_search_results');
     navigate('/search', { replace: true });
   };
 
@@ -30,7 +48,10 @@ const Search = () => {
         limit: 24,
         'includes[]': ['cover_art']
       });
-      setResults(data.data || []);
+      const mangaData = data.data || [];
+      setResults(mangaData);
+      // Simpan hasil tag ke session
+      saveToSession('', mangaData); 
     } catch (err) {
       console.error("Gagal memuat manga berdasarkan tag:", err);
     } finally {
@@ -42,10 +63,11 @@ const Search = () => {
     if (tagIdFromUrl) {
       loadMangaByTag(tagIdFromUrl);
     }
+    // Jika tidak ada tag dan tidak ada hasil di session, biarkan kosong
   }, [tagIdFromUrl]);
 
   const handleSearchSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!searchTerm) return;
     setLoading(true);
     try {
@@ -54,7 +76,13 @@ const Search = () => {
         limit: 24,
         'includes[]': ['cover_art']
       });
-      setResults(data.data || []);
+      const mangaData = data.data || [];
+      setResults(mangaData);
+      
+      // --- MODIFIKASI: Simpan ke Session Storage ---
+      saveToSession(searchTerm, mangaData);
+      // ----------------------------------------------
+
       if (tagIdFromUrl) navigate('/search', { replace: true });
     } catch (err) {
       console.error(err);
